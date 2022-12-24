@@ -42,46 +42,5 @@ class test_engine(unittest.TestCase):
         thing.getCurrentTemperature = returnMockWithValue(15.5)
         self.assertEqual(engine.runDecisionEngine(), ENGINE_OFF)
 
-    def test_runDecisionEngineWithHysteresis(self):
-        thing.getEngineCurrentState = returnMockWithValue("on")
-        thing.getDesiredTemperature = returnMockWithValue(16)
-        thing.getCurrentTemperature = returnMockWithValue(19)
-        self.assertEqual(engine.runDecisionEngineWithHysteresis(), ENGINE_OFF)
-
-        thing.getEngineCurrentState = returnMockWithValue("on")
-        thing.getDesiredTemperature = returnMockWithValue(16)
-        thing.getCurrentTemperature = returnMockWithValue(16.5)
-        self.assertEqual(engine.runDecisionEngineWithHysteresis(), ENGINE_ON)
-
-        thing.getEngineCurrentState = returnMockWithValue("on")
-        thing.getDesiredTemperature = returnMockWithValue(16)
-        thing.getCurrentTemperature = returnMockWithValue(16.6)
-        self.assertEqual(engine.runDecisionEngineWithHysteresis(), ENGINE_OFF)
-
-        thing.getEngineCurrentState = returnMockWithValue("on")
-        thing.getDesiredTemperature = returnMockWithValue(16)
-        thing.getCurrentTemperature = returnMockWithValue(16.4)
-        self.assertEqual(engine.runDecisionEngineWithHysteresis(), ENGINE_ON)
-
-        thing.getEngineCurrentState = returnMockWithValue("off")
-        thing.getDesiredTemperature = returnMockWithValue(16)
-        thing.getCurrentTemperature = returnMockWithValue(15.5)
-        self.assertEqual(engine.runDecisionEngineWithHysteresis(), ENGINE_ON)
-
-        thing.getEngineCurrentState = returnMockWithValue("off")
-        thing.getDesiredTemperature = returnMockWithValue(16)
-        thing.getCurrentTemperature = returnMockWithValue(15.8)
-        self.assertEqual(engine.runDecisionEngineWithHysteresis(), ENGINE_OFF)
-
-        thing.getEngineCurrentState = returnMockWithValue("off")
-        thing.getDesiredTemperature = returnMockWithValue(16)
-        thing.getCurrentTemperature = returnMockWithValue(15.4)
-        self.assertEqual(engine.runDecisionEngineWithHysteresis(), ENGINE_ON)
-
-        thing.getEngineCurrentState = returnMockWithValue("on")
-        thing.getDesiredTemperature = returnMockWithValue(16)
-        thing.getCurrentTemperature = returnMockWithValue(15.8)
-        self.assertEqual(engine.runDecisionEngineWithHysteresis(), ENGINE_ON)
-
 if __name__ == '__main__':
     unittest.main()
