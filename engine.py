@@ -10,7 +10,7 @@ sensorList = {
 	"zimni_zahrada" : "climate.zimni_zahrada"
 }
 
-def getCurrentState():
+def getEngineCurrentState():
 	return hass.states.get(entity).state
 
 def engineOn():
@@ -24,11 +24,11 @@ def engineOff():
 def getCurrentTemperature(entity):
 	return hass.states.get(entity).attributes["current_temperature"]
 
-def getTemperature(entity):
+def getDesiredTemperature(entity):
         return hass.states.get(entity).attributes["temperature"]
 
 def getTemperatureDiff(entity):
-	return (getCurrentTemperature(entity)-getTemperature(entity))
+	return (getCurrentTemperature(entity)-getDesiredTemperature(entity))
 
 def isDecisionEngineBlocked():
 	lastChange = hass.states.get(entity).last_changed.timestamp()
@@ -37,20 +37,41 @@ def isDecisionEngineBlocked():
 	if lastChangeInSeconds < -1*blockIntervalInSeconds:
 		return False
 	return True
-	
 
 def runDecisionEngine():
-	if isDecisionEngineBlocked():
-		logger.info("decession engine blocked, ending...")
-		return None
-	logger.info("starting decession engine for heating....")
-	for sensorKey in sensorList:
-		currentDiff = getTemperatureDiff(sensorList[sensorKey])
-		if (currentDiff < maxDiffToRunEngine):
-			logger.info("sensor '%s' out of tolerance diff limit (%s), starting engine...",sensorKey,currentDiff)
-			return engineOn()
-	
-	logger.info("all diffs in tolerance limits, no heating needed...")	
-	engineOff()
+    if isDecisionEngineBlocked():
+        logger.info("decession engine blocked, ending...")
+        return None
+    logger.info("starting decession engine for heating....")
+    for sensorKey in sensorList:
+        currentDiff = getTemperatureDiff(sensorList[sensorKey])
+        if (currentDiff < maxDiffToRunEngine):
+            logger.info("sensor '%s' out of tolerance diff limit (%s), starting engine...",sensorKey,currentDiff)
+            return engineOn()
 
-runDecisionEngine()
+    logger.info("all diffs in tolerance limits, no heating needed...")
+
+    return engineOff()
+
+def runDecisionEngineWithHysteresis():
+    if isDecisionEngineBlocked():
+        logger.info("decession engine blocked, ending...")
+        return None
+    logger.info("starting decession engine for heating....")
+
+    finalDiff = maxDiffToRunEngine
+    if (getEngineCurrentState() == "on"):
+        logger.info("engine on, inverting the diff limit")
+        finalDiff = -1 * maxDiffToRunEngine
+    for sensorKey in sensorList:
+        currentDiff = getTemperatureDiff(sensorList[sensorKey])
+        if (currentDiff <= finalDiff):
+            logger.info("sensor '%s' out of tolerance diff limit (%s), starting engine...",sensorKey,currentDiff)
+            return engineOn()
+
+    logger.info("all diffs in tolerance limits, no heating needed...")
+
+    return engineOff()
+
+#runDecisionEngine()
+runDecisionEngineWithHysteresis()
