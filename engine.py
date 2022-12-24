@@ -1,31 +1,23 @@
 entity = "switch.kotel"
 maxDiffToRunEngine = -0.5
-blockIntervalInSeconds = 60*10
+blockIntervalInSeconds =60
 
 sensorList = {
-        "obyvak" : "climate.bfc4b12743d95bf5b1paaj",
-        "koupelna" : "climate.bfc2943d4e885e44afarml",
-        "kubik" : "climate.bfce8fac3c330bbc7cb8cl",
-        "marketka" : "climate.bf255f1dfba3639cb6rbda",
-        "loznice" : "climate.bfd99da354381754cdsk6r",
-        "koupelna" : "climate.bfc2943d4e885e44afarml",
-        "zimni_zahrada" : "climate.bfb62e94aeeeebd6075hp7"
+	"obyvak" : "climate.obyvak1",
+	"kubik" : "climate.kubik",
+	"marketka" : "climate.marketka",
+	"loznice" : "climate.loznice",
+	"zimni_zahrada" : "climate.zimni_zahrada"
 }
 
 def getCurrentState():
 	return hass.states.get(entity).state
 
 def engineOn():
-	if (getCurrentState() == 'on'):
-		logger.info("nothing to do, already switched on")
-		return None
 	logger.info("switching engine on")
 	hass.services.call("switch","turn_on",{"entity_id": entity})
 
 def engineOff():
-	if (getCurrentState() == 'off'):
-                logger.info("nothing to do, already switched off")
-                return None
 	logger.info("switching engine off")
 	hass.services.call("switch","turn_off",{"entity_id": entity})
 
